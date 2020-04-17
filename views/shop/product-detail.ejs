@@ -8,14 +8,16 @@
 
         <h1><%=product.title%></h1>
         <hr>
-        <div>
-            <img src="<%= product.imageUrl%>" alt="<%= product.title %>">
+        <div class="image">
+            <picture>
+                <img src="<%= product.imageUrl%>" alt="<%= product.title %>">
+            </picture>
         </div>
         <h2>$ <%= product.price%></h2>
         <p><%= product.description%></p>
         <%- include('../includes/add-to-cart.ejs') %>
         <% } else { %>
-                <h2 style="color: crimson;">Aucun Produit ! </h2> 
+        <h2 style="color: crimson;">Aucun Produit ! </h2>
 
         <% } %>
     </main>
