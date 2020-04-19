@@ -8,6 +8,8 @@ const app = express();
 const errorController = require("./controllers/error");
 const mongoConnect = require("./util/database").mongoConnect;
 
+const User = require("./models/user");
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -18,15 +20,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  // User.findByPk(1)
-  //   .then((user) => {
-  //     req.user = user;
-  //     next();
-  //   })
-  //   .catch((err) => {
-  //     console.log("err", err);
-  //   });
-  next();
+  User.findByEmail("amaryassa@yahoo.fr")
+    .then((user) => {
+      req.user = new User(user.name, user.email, user.cart, user._id);
+
+      next();
+    })
+    .catch((err) => {
+      console.log("err", err);
+    });
 });
 
 app.use("/admin", adminRoutes);
@@ -36,5 +38,16 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 mongoConnect(() => {
-  app.listen(3000);
+  const userTest = new User("Amar", "amaryassa@yahoo.fr", { items: [] });
+  User.findByEmail("amaryassa@yahoo.fr")
+    .then((user) => {
+      if (!user) {
+        return userTest.save();
+      }
+      return user;
+    })
+    .then(() => {
+      app.listen(3000);
+    })
+    .catch((err) => console.log(err));
 });
