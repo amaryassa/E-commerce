@@ -26,4 +26,19 @@
   padding: 0.5rem;
   border: 1px solid #00695c;
   color: #00695c;
+  display: flex;
+  align-items: center;
+}
+
+.orders__products__image {
+  object-fit: contain;
+  text-indent: -9999px;
+  overflow: hidden;
+  margin: auto !important;
+  max-width: 100%;
+  height: 60px;
+}
+
+.orders__products__text {
+  padding-left: 20px;
 }
