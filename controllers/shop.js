@@ -8,7 +8,6 @@ exports.getIndex = (req, res, next) => {
                 prods: products,
                 pageTitle: "Shop",
                 path: "/",
-                isAuthenticated: req.session.isLoggedIn,
             });
         })
         .catch((err) => {
@@ -23,7 +22,6 @@ exports.getProducts = (req, res, next) => {
                 prods: products,
                 pageTitle: "All Products",
                 path: "/products",
-                isAuthenticated: req.session.isLoggedIn,
             });
         })
         .catch((err) => {
@@ -38,7 +36,6 @@ exports.getProduct = (req, res, next) => {
                 product: product,
                 pageTitle: "product detail",
                 path: "/product-detail",
-                isAuthenticated: req.session.isLoggedIn,
             });
         })
         .catch((err) => console.log(err));
@@ -55,7 +52,6 @@ exports.getCart = (req, res, next) => {
                 pageTitle: "Your cart",
                 path: "/cart",
                 products: products,
-                isAuthenticated: req.session.isLoggedIn,
             });
         })
         .catch((err) => console.log("exports.getCart -> err", err));
@@ -77,7 +73,7 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
     req.user
-        .deleteItemFromCart(prodId)
+        .removeFromCart(prodId)
         .then((result) => {
             res.redirect("/cart");
         })
@@ -94,7 +90,7 @@ exports.postOrders = (req, res, next) => {
             });
             const order = new Order({
                 user: {
-                    name: req.user.name,
+                    email: req.user.email,
                     userId: req.user,
                 },
                 products: products,
@@ -117,7 +113,6 @@ exports.getOrders = (req, res, next) => {
                 path: "/orders",
                 pageTitle: "Your Orders",
                 orders: orders,
-                isAuthenticated: req.session.isLoggedIn,
             });
         })
         .catch((err) => console.log(err));
