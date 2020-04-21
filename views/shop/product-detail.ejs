@@ -1,24 +1,30 @@
 <%- include('../includes/head.ejs') %>
-</head>
+    </head>
 
-<body>
-    <%- include('../includes/navigation.ejs') %>
-    <main class="centered">
-        <%if (product) { %>
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+            <main class="centered">
+                <%if (product) { %>
 
-        <h1><%=product.title%></h1>
-        <hr>
-        <div class="image">
-            <picture>
-                <img src="<%= product.imageUrl%>" alt="<%= product.title %>">
-            </picture>
-        </div>
-        <h2>$ <%= product.price%></h2>
-        <p><%= product.description%></p>
-        <%- include('../includes/add-to-cart.ejs') %>
-        <% } else { %>
-        <h2 style="color: crimson;">Aucun Produit ! </h2>
+                    <h1>
+                        <%=product.title%>
+                    </h1>
+                    <hr>
+                    <div class="image">
+                        <picture>
+                            <img src="<%= product.imageUrl%>" alt="<%= product.title %>">
+                        </picture>
+                    </div>
+                    <h2>$
+                        <%= product.price%>
+                    </h2>
+                    <p>
+                        <%= product.description%>
+                    </p>
+                    <%- include('../includes/add-to-cart.ejs') %>
+                        <% } else { %>
+                            <h2 style="color: crimson;">Aucun Produit ! </h2>
 
-        <% } %>
-    </main>
-    <%- include('../includes/end.ejs') %>
+                            <% } %>
+            </main>
+            <%- include('../includes/end.ejs') %>
