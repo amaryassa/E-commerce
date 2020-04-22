@@ -1,4 +1,5 @@
 const path = require("path");
+const CONFIG = require("./util/config.json");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -11,8 +12,7 @@ const flash = require("connect-flash");
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
-const MONGODB_URI =
-    "mongodb+srv://amar:amar@cluster0-6y5wb.mongodb.net/shop?retryWrites=true&w=majority";
+const MONGODB_URI = CONFIG.MONGODB_URI;
 
 const app = express();
 const store = new MongoDBStore({
@@ -44,7 +44,6 @@ app.use(csrfProtection);
 app.use(flash());
 
 app.use((req, res, next) => {
-    // User.findOne({ email: "amaryassa@yahoo.fr" })
     if (!req.session.user) {
         return next();
     }
@@ -77,18 +76,3 @@ mongoose
         app.listen(3000);
     })
     .catch((err) => console.log(err));
-
-// .then((result) => {
-//     return User.findOne({ email: "amaryassa@yahoo.fr" });
-// })
-// .then((user) => {
-//     if (!user) {
-//         const userTest = new User({
-//             name: "Amar",
-//             email: "amaryassa@yahoo.fr",
-//             cart: { items: [] },
-//         });
-//         return userTest.save();
-//     }
-//     return user;
-// })
