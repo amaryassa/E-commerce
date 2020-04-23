@@ -2,16 +2,35 @@ const fs = require("fs");
 const path = require("path");
 
 const PDFDocument = require("pdfkit");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 
-exports.getIndex = (req, res, next) => {
+const ITEMS_PER_PAGE = 2;
+
+exports.getProducts = (req, res, next) => {
+    const page = +req.query.page || 1;
+    let totalItems;
+
     Product.find()
+        .countDocuments()
+        .then((numProducts) => {
+            totalItems = numProducts;
+            return Product.find()
+                .skip((page - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
         .then((products) => {
-            res.render("shop/index", {
+            res.render("shop/product-list", {
                 prods: products,
-                pageTitle: "Shop",
-                path: "/",
+                pageTitle: "Products",
+                path: "/products",
+                currentPage: page,
+                hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+                hasPreviousPage: page > 1,
+                nextPage: page + 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
             });
         })
         .catch((err) => {
@@ -21,12 +40,13 @@ exports.getIndex = (req, res, next) => {
         });
 };
 
-exports.getProducts = (req, res, next) => {
-    Product.find()
-        .then((products) => {
-            res.render("shop/product-list", {
-                prods: products,
-                pageTitle: "All Products",
+exports.getProduct = (req, res, next) => {
+    const prodId = req.params.productId;
+    Product.findById(prodId)
+        .then((product) => {
+            res.render("shop/product-detail", {
+                product: product,
+                pageTitle: product.title,
                 path: "/products",
             });
         })
@@ -36,14 +56,30 @@ exports.getProducts = (req, res, next) => {
             return next(error);
         });
 };
-exports.getProduct = (req, res, next) => {
-    const prodId = req.params.productId;
-    Product.findById(prodId)
-        .then((product) => {
-            res.render("shop/product-detail", {
-                product: product,
-                pageTitle: "product detail",
-                path: "/product-detail",
+
+exports.getIndex = (req, res, next) => {
+    const page = +req.query.page || 1;
+    let totalItems;
+
+    Product.find()
+        .countDocuments()
+        .then((numProducts) => {
+            totalItems = numProducts;
+            return Product.find()
+                .skip((page - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
+        .then((products) => {
+            res.render("shop/index", {
+                prods: products,
+                pageTitle: "Shop",
+                path: "/",
+                currentPage: page,
+                hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+                hasPreviousPage: page > 1,
+                nextPage: page + 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
             });
         })
         .catch((err) => {
@@ -58,11 +94,10 @@ exports.getCart = (req, res, next) => {
         .populate("cart.items.productId")
         .execPopulate()
         .then((user) => {
-            products = user.cart.items;
-            console.log("exports.getCart -> products", products);
+            const products = user.cart.items;
             res.render("shop/cart", {
-                pageTitle: "Your cart",
                 path: "/cart",
+                pageTitle: "Your Cart",
                 products: products,
             });
         })
@@ -77,11 +112,10 @@ exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
     Product.findById(prodId)
         .then((product) => {
-            console.log("Added to User Cart");
-
             return req.user.addToCart(product);
         })
         .then((result) => {
+            console.log(result);
             res.redirect("/cart");
         })
         .catch((err) => {
@@ -90,6 +124,7 @@ exports.postCart = (req, res, next) => {
             return next(error);
         });
 };
+
 exports.postCartDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
     req.user
@@ -104,7 +139,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
         });
 };
 
-exports.postOrders = (req, res, next) => {
+exports.postOrder = (req, res, next) => {
     req.user
         .populate("cart.items.productId")
         .execPopulate()
@@ -208,7 +243,6 @@ exports.getInvoice = (req, res, next) => {
             // const file = fs.createReadStream(invoicePath);
 
             // file.pipe(res);
-            //
         })
         .catch((err) => next(err));
 };
