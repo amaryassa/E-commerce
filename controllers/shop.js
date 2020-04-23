@@ -208,6 +208,7 @@ exports.getInvoice = (req, res, next) => {
             // const file = fs.createReadStream(invoicePath);
 
             // file.pipe(res);
+            //
         })
         .catch((err) => next(err));
 };
